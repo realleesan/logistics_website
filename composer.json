@@ -1,0 +1,17 @@
+{
+    "name": "vinalogistics/website",
+    "description": "VINA LOGISTICS Website",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "vlucas/phpdotenv": "^5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "VinaLogistics\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+} 

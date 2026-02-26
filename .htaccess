@@ -1,0 +1,171 @@
+RewriteEngine On
+
+# Force HTTPS for production
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Base path (set to root for production hosting)
+RewriteBase /
+
+# Bảo mật - Ẩn file sensitive (Apache 2.4+ syntax)
+<Files ".htaccess">
+    Require all denied
+  </Files>
+
+<Files "*.sql">
+    Require all denied
+  </Files>
+
+# Bảo vệ thư mục admin và database bằng cách giữ nguyên URL gốc
+RewriteRule ^admin/(.*)$ admin/$1 [L]
+RewriteRule ^database/(.*)$ database/$1 [L]
+
+# Bảo vệ các thư mục hệ thống
+RewriteRule ^includes/(.*)$ - [F,L]
+RewriteRule ^lib/(.*)$ - [F,L]
+
+# Cho phép truy cập trực tiếp các file static
+RewriteRule ^assets/(.*)$ assets/$1 [L]
+RewriteRule ^logo\.jpg$ logo.jpg [L]
+
+# URL thân thiện cho trang chủ  
+RewriteRule ^/?$ index.php [L]
+
+# URL thân thiện cho các trang chính
+RewriteRule ^gioi-thieu/?$ about.php [L]
+RewriteRule ^dich-vu/?$ services.php [L]
+RewriteRule ^tin-tuc/?$ news.php [L]
+RewriteRule ^lien-he/?$ contact.php [L]
+
+# URL thân thiện cho trang chi tiết tin tức
+RewriteRule ^tin-tuc/([a-zA-Z0-9\-]+)/?$ news-detail.php?slug=$1 [L]
+
+# URL thân thiện cho tìm kiếm
+RewriteRule ^tim-kiem/([^/]+)/?$ search.php?q=$1 [L]
+RewriteRule ^tim-kiem/?$ search.php [L]
+
+# Ẩn extension .php cho các file còn lại (fallback)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^\.]+)$ $1.php [L]
+
+# Redirect từ .php sang URL thân thiện (301 redirect cho SEO)
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+index\.php[\s?] [NC]
+RewriteRule ^index\.php$ / [R=301,L]
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+about\.php[\s?] [NC] 
+RewriteRule ^about\.php$ /gioi-thieu [R=301,L]
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+services\.php[\s?] [NC]
+RewriteRule ^services\.php$ /dich-vu [R=301,L]
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+news\.php[\s?] [NC]
+RewriteRule ^news\.php$ /tin-tuc [R=301,L]
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+contact\.php[\s?] [NC]
+RewriteRule ^contact\.php$ /lien-he [R=301,L]
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+news-detail\.php\?slug=([^\s&]+) [NC]
+RewriteRule ^news-detail\.php$ /tin-tuc/%1? [R=301,L]
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+search\.php\?q=([^\s&]+) [NC]
+RewriteRule ^search\.php$ /tim-kiem/%1? [R=301,L]
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+search\.php[\s?] [NC]
+RewriteRule ^search\.php$ /tim-kiem [R=301,L]
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# MIME Types
+<IfModule mod_mime.c>
+    AddType application/javascript .js
+    AddType text/css .css
+    AddType image/png .png
+    AddType image/jpg .jpg
+    AddType image/jpeg .jpeg
+    AddType image/gif .gif
+    AddType image/webp .webp
+</IfModule>
+
+# Force MIME types for JavaScript files
+<FilesMatch "\.js$">
+    Header set Content-Type "application/javascript"
+</FilesMatch>
+
+# Force MIME types for CSS files
+<FilesMatch "\.css$">
+    Header set Content-Type "text/css"
+</FilesMatch>
+
+# Force MIME types for image files
+<FilesMatch "\.png$">
+    Header set Content-Type "image/png"
+</FilesMatch>
+<FilesMatch "\.(jpg|jpeg)$">
+    Header set Content-Type "image/jpeg"
+</FilesMatch>
+<FilesMatch "\.gif$">
+    Header set Content-Type "image/gif"
+</FilesMatch>
+<FilesMatch "\.webp$">
+    Header set Content-Type "image/webp"
+</FilesMatch>
+
+# Gzip compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/json
+</IfModule>
+
+# Cache static files
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/pdf "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    ExpiresByType application/x-shockwave-flash "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+    ExpiresDefault "access plus 2 days"
+</IfModule>
+
+# PHP settings to prevent 500 errors
+<IfModule mod_php7.c>
+    php_value memory_limit 256M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value post_max_size 64M
+    php_value upload_max_filesize 64M
+    php_value max_file_uploads 20
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_value error_log logs/error.log
+</IfModule>
+
+# Prevent access to sensitive files
+<FilesMatch "\.(env|log|sql|bak|backup)$">
+    Require all denied
+  </FilesMatch>
+
+# Custom error pages
+ErrorDocument 404 /404.php
+ErrorDocument 500 /500.php 

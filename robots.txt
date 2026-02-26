@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and sensitive directories
+Disallow: /admin/
+Disallow: /database/
+Disallow: /includes/
+Disallow: /lib/
+Disallow: /logs/
+Disallow: /.env
+Disallow: /.gitignore
+
+# Allow assets
+Allow: /assets/
+Allow: /logo.jpg
+Allow: /qr_code.jpg
+
+# Sitemap
+Sitemap: https://truongvinalogistics.com.vn/sitemap.xml
+
+# Crawl-delay for better server performance
+Crawl-delay: 1 

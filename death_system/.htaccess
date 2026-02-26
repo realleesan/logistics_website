@@ -1,0 +1,70 @@
+# Death Protection System - Security Configuration
+# Bảo vệ thư mục death_system
+
+# Chặn truy cập trực tiếp vào các file nhạy cảm
+<Files "*.log">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "*.txt">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Chặn truy cập vào file .htaccess
+<Files ".htaccess">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Chặn truy cập vào file README
+<Files "README.md">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Chặn truy cập vào file JavaScript integration
+<Files "website_integration.js">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Chỉ cho phép truy cập các file cần thiết
+<Files "index.php">
+    Order allow,deny
+    Allow from all
+</Files>
+
+<Files "activation.php">
+    Order allow,deny
+    Allow from all
+</Files>
+
+<Files "check_status.php">
+    Order allow,deny
+    Allow from all
+</Files>
+
+# Bảo vệ khỏi directory listing
+Options -Indexes
+
+# Bảo vệ khỏi các request nguy hiểm
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Chặn các request không hợp lệ
+    RewriteCond %{REQUEST_METHOD} !^(GET|POST)$
+    RewriteRule .* - [F]
+    
+    # Chặn các file không được phép
+    RewriteRule \.(log|txt|md|js)$ - [F]
+</IfModule>
+
+# Headers bảo mật
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule> 
