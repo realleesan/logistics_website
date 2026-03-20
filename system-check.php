@@ -1,255 +1,169 @@
 <?php
 /**
- * System Check for Vina Logistics Website
- * File này kiểm tra tất cả các thành phần cần thiết cho website
+ * System Check - Diagnostic Tool for VINA LOGISTICS
+ * This file helps identify issues causing inconsistent website loading
  */
 
-echo "<h1>🔍 System Check - Vina Logistics</h1>";
-echo "<style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    .success { color: green; }
-    .error { color: red; }
-    .warning { color: orange; }
-    .info { color: blue; }
-    .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
-</style>";
+// Set strict error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
 
-// ===========================================
-// 1. PHP Version Check
-// ===========================================
-echo "<div class='section'>";
-echo "<h2>📋 PHP Version Check</h2>";
-$php_version = phpversion();
-echo "<p>PHP Version: <strong>$php_version</strong></p>";
+$issues = [];
+$warnings = [];
+$success = [];
 
-if (version_compare($php_version, '7.4.0', '>=')) {
-    echo "<p class='success'>✅ PHP version is compatible (>= 7.4.0)</p>";
-} else {
-    echo "<p class='error'>❌ PHP version is too old. Required: >= 7.4.0</p>";
-}
-echo "</div>";
-
-// ===========================================
-// 2. Required Extensions Check
-// ===========================================
-echo "<div class='section'>";
-echo "<h2>🔧 Required Extensions Check</h2>";
-
-$required_extensions = [
-    'pdo',
-    'pdo_mysql',
-    'mbstring',
-    'openssl',
-    'curl',
-    'gd',
-    'json'
-];
-
-foreach ($required_extensions as $ext) {
-    if (extension_loaded($ext)) {
-        echo "<p class='success'>✅ $ext extension is loaded</p>";
-    } else {
-        echo "<p class='error'>❌ $ext extension is missing</p>";
-    }
-}
-echo "</div>";
-
-// ===========================================
-// 3. Database Connection Check
-// ===========================================
-echo "<div class='section'>";
-echo "<h2>🗄️ Database Connection Check</h2>";
-
-try {
-    require_once 'database/config.php';
+// Check 1: Image Files Size
+echo "=== KIỂM TRA HÌNH ẢNH ===<br>";
+$imageDir = __DIR__ . '/assets/images';
+if (is_dir($imageDir)) {
+    $images = glob($imageDir . '/*.png');
+    $images = array_merge($images, glob($imageDir . '/*.jpg'));
+    $images = array_merge($images, glob($imageDir . '/*.jpeg'));
+    $images = array_merge($images, glob($imageDir . '/*.webp'));
     
-    if (isset($pdo)) {
-        echo "<p class='success'>✅ Database connection successful</p>";
+    $largeImages = [];
+    $totalSize = 0;
+    
+    foreach ($images as $image) {
+        $size = filesize($image);
+        $totalSize += $size;
+        $sizeKB = round($size / 1024);
+        $filename = basename($image);
         
-        // Test query
-        $stmt = $pdo->query("SELECT COUNT(*) FROM information_schema.tables");
-        $table_count = $stmt->fetchColumn();
-        echo "<p class='info'>📊 Total tables in database: $table_count</p>";
-        
-        // Check required tables
-        $required_tables = ['news', 'services', 'contacts', 'news_categories'];
-        foreach ($required_tables as $table) {
-            try {
-                $stmt = $pdo->query("SELECT COUNT(*) FROM $table");
-                $count = $stmt->fetchColumn();
-                echo "<p class='success'>✅ Table '$table' exists with $count records</p>";
-            } catch (Exception $e) {
-                echo "<p class='error'>❌ Table '$table' is missing</p>";
-            }
-        }
-    } else {
-        echo "<p class='error'>❌ Database connection failed</p>";
-    }
-} catch (Exception $e) {
-    echo "<p class='error'>❌ Database error: " . $e->getMessage() . "</p>";
-}
-echo "</div>";
-
-// ===========================================
-// 4. File Permissions Check
-// ===========================================
-echo "<div class='section'>";
-echo "<h2>📁 File Permissions Check</h2>";
-
-$files_to_check = [
-    'database/config.php' => 'readable',
-    'database/smtp-config.php' => 'readable',
-    'includes/header.php' => 'readable',
-    'includes/footer.php' => 'readable',
-    'assets/css/style.css' => 'readable',
-    'assets/js/main.js' => 'readable',
-    'logo.jpg' => 'readable',
-    'logo-removebg.png' => 'readable'
-];
-
-foreach ($files_to_check as $file => $permission) {
-    if (file_exists($file)) {
-        if ($permission == 'readable' && is_readable($file)) {
-            echo "<p class='success'>✅ $file is readable</p>";
-        } elseif ($permission == 'writable' && is_writable($file)) {
-            echo "<p class='success'>✅ $file is writable</p>";
+        if ($sizeKB > 500) {
+            $largeImages[] = [
+                'name' => $filename,
+                'size' => $sizeKB
+            ];
+            echo "⚠️  $filename: ${sizeKB}KB (QUÁ LỚN)<br>";
         } else {
-            echo "<p class='error'>❌ $file permission issue</p>";
+            echo "✅ $filename: ${sizeKB}KB<br>";
         }
-    } else {
-        echo "<p class='error'>❌ $file does not exist</p>";
     }
-}
-echo "</div>";
-
-// ===========================================
-// 5. Email Configuration Check
-// ===========================================
-echo "<div class='section'>";
-echo "<h2>📧 Email Configuration Check</h2>";
-
-if (defined('SMTP_HOST') && defined('SMTP_USERNAME')) {
-    echo "<p class='success'>✅ SMTP configuration is set</p>";
-    echo "<p class='info'>📧 SMTP Host: " . SMTP_HOST . "</p>";
-    echo "<p class='info'>📧 SMTP Username: " . SMTP_USERNAME . "</p>";
     
-    if (defined('SMTP_PASSWORD') && !empty(SMTP_PASSWORD)) {
-        echo "<p class='success'>✅ SMTP Password is configured</p>";
-    } else {
-        echo "<p class='warning'>⚠️ SMTP Password is not configured</p>";
+    $totalSizeMB = round($totalSize / (1024 * 1024), 2);
+    echo "<br>Tổng kích thước hình ảnh: {$totalSizeMB}MB<br>";
+    
+    if (count($largeImages) > 0) {
+        $issues[] = "Có " . count($largeImages) . " hình ảnh có kích thước > 500KB. Đây là NGUYÊN NHÂN CHÍNH gây ra lỗi loading trên một số thiết bị.";
     }
-} else {
-    echo "<p class='error'>❌ SMTP configuration is missing</p>";
-}
-echo "</div>";
-
-// ===========================================
-// 6. URL Rewriting Check
-// ===========================================
-echo "<div class='section'>";
-echo "<h2>🔗 URL Rewriting Check</h2>";
-
-if (function_exists('apache_get_modules')) {
-    $modules = apache_get_modules();
-    if (in_array('mod_rewrite', $modules)) {
-        echo "<p class='success'>✅ mod_rewrite is enabled</p>";
-    } else {
-        echo "<p class='warning'>⚠️ mod_rewrite may not be enabled</p>";
-    }
-} else {
-    echo "<p class='info'>ℹ️ Cannot check mod_rewrite status (not Apache)</p>";
 }
 
-// Check if .htaccess exists
-if (file_exists('.htaccess')) {
-    echo "<p class='success'>✅ .htaccess file exists</p>";
-} else {
-    echo "<p class='error'>❌ .htaccess file is missing</p>";
-}
-echo "</div>";
-
-// ===========================================
-// 7. Security Check
-// ===========================================
-echo "<div class='section'>";
-echo "<h2>🔒 Security Check</h2>";
-
-// Check if sensitive files are accessible
-$sensitive_files = [
-    'database/smtp-config.php',
-    'admin/config.php',
-    'database/production-config.php'
+// Check 2: PHP Configuration
+echo "<br>=== KIỂM TRA CẤU HÌNH PHP ===<br>";
+$phpSettings = [
+    'memory_limit' => ini_get('memory_limit'),
+    'max_execution_time' => ini_get('max_execution_time'),
+    'post_max_size' => ini_get('post_max_size'),
+    'upload_max_filesize' => ini_get('upload_max_filesize'),
+    'display_errors' => ini_get('display_errors'),
 ];
 
-foreach ($sensitive_files as $file) {
-    if (file_exists($file)) {
-        echo "<p class='success'>✅ $file exists</p>";
-    } else {
-        echo "<p class='warning'>⚠️ $file is missing</p>";
-    }
+foreach ($phpSettings as $key => $value) {
+    echo "$key: $value<br>";
 }
 
-// Check SSL
-if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
-    echo "<p class='success'>✅ SSL is enabled</p>";
+if (intval($phpSettings['max_execution_time']) < 60) {
+    $warnings[] = "max_execution_time có thể quá thấp ($value). Khuyến nghị: 60-300";
+}
+
+// Check 3: Death Protection Lock
+echo "<br>=== KIỂM TRA HỆ THỐNG BẢO VỆ ===<br>";
+$lockFile = __DIR__ . '/logs/website_locked.txt';
+if (file_exists($lockFile)) {
+    $issues[] = "Website đang bị khóa! File: logs/website_locked.txt tồn tại";
+    echo "🔒 Website đang bị khóa bởi hệ thống bảo vệ<br>";
 } else {
-    echo "<p class='warning'>⚠️ SSL is not enabled (recommended for production)</p>";
+    echo "✅ Website không bị khóa<br>";
 }
-echo "</div>";
 
-// ===========================================
-// 8. Performance Check
-// ===========================================
-echo "<div class='section'>";
-echo "<h2>⚡ Performance Check</h2>";
+// Check 4: External Resources
+echo "<br>=== KIỂM TRA TÀI NGUYÊN NGOẠI VI ===<br>";
+$externalResources = [
+    'cdnjs.cloudflare.com/ajax/libs/font-awesome' => 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+    'cdn.jsdelivr.net (Bootstrap)' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
+    'Facebook SDK' => 'https://connect.facebook.net/vi_VN/sdk.js',
+];
 
-// Check memory limit
-$memory_limit = ini_get('memory_limit');
-echo "<p class='info'>💾 Memory Limit: $memory_limit</p>";
+foreach ($externalResources as $name => $url) {
+    echo "Checking $name...<br>";
+}
 
-// Check max execution time
-$max_execution_time = ini_get('max_execution_time');
-echo "<p class='info'>⏱️ Max Execution Time: $max_execution_time seconds</p>";
+// Check 5: Database Connection
+echo "<br>=== KIỂM TRA DATABASE ===<br>";
+try {
+    require_once __DIR__ . '/database/config.php';
+    echo "✅ Kết nối database thành công<br>";
+} catch (Exception $e) {
+    $issues[] = "Lỗi kết nối database: " . $e->getMessage();
+    echo "❌ Lỗi kết nối database: " . $e->getMessage() . "<br>";
+}
 
-// Check upload max filesize
-$upload_max_filesize = ini_get('upload_max_filesize');
-echo "<p class='info'>📤 Upload Max Filesize: $upload_max_filesize</p>";
-echo "</div>";
+// Check 6: .htaccess Configuration
+echo "<br>=== KIỂM TRA .HTACCESS ===<br>";
+$htaccess = __DIR__ . '/.htaccess';
+if (file_exists($htaccess)) {
+    echo "✅ File .htaccess tồn tại<br>";
+    
+    // Check for common issues
+    $htcontent = file_get_contents($htaccess);
+    if (strpos($htcontent, 'php_value memory_limit') !== false) {
+        echo "✅ Có cấu hình PHP memory_limit trong .htaccess<br>";
+    }
+    if (strpos($htcontent, 'mod_deflate') !== false) {
+        echo "✅ Gzip compression đã bật<br>";
+    }
+    if (strpos($htcontent, 'mod_expires') !== false) {
+        echo "✅ Browser caching đã bật<br>";
+    }
+} else {
+    $issues[] = "File .htaccess không tồn tại!";
+    echo "❌ File .htaccess không tồn tại<br>";
+}
 
-// ===========================================
-// 9. Recommendations
-// ===========================================
-echo "<div class='section'>";
-echo "<h2>💡 Recommendations</h2>";
+// Summary
+echo "<br>=== TỔNG KẾT VẤN ĐỀ ===<br>";
 
-echo "<ul>";
-echo "<li>🔒 Enable SSL certificate for production</li>";
-echo "<li>📧 Configure SMTP password in database/smtp-config.php</li>";
-echo "<li>🔐 Change admin password in admin/config.php</li>";
-echo "<li>🌐 Update domain in robots.txt and sitemap.xml</li>";
-echo "<li>📊 Set up Google Analytics (optional)</li>";
-echo "<li>🔄 Configure backup system</li>";
-echo "<li>📱 Test mobile responsiveness</li>";
-echo "<li>🚀 Optimize images for web</li>";
-echo "</ul>";
-echo "</div>";
+if (count($issues) > 0) {
+    echo "<div style='background: #ffebee; padding: 15px; border-radius: 5px;'>";
+    echo "<h3 style='color: #c62828;'>⚠️ VẤN ĐỀ CẦN KHẮC PHỤC:</h3>";
+    echo "<ul>";
+    foreach ($issues as $issue) {
+        echo "<li>$issue</li>";
+    }
+    echo "</ul>";
+    echo "</div>";
+}
 
-// ===========================================
-// 10. Summary
-// ===========================================
-echo "<div class='section'>";
-echo "<h2>📋 Summary</h2>";
-echo "<p>System check completed. Please review all sections above.</p>";
-echo "<p><strong>Next steps:</strong></p>";
+if (count($warnings) > 0) {
+    echo "<div style='background: #fff3e0; padding: 15px; border-radius: 5px;'>";
+    echo "<h3 style='color: #e65100;'>⚡ CẢNH BÁO:</h3>";
+    echo "<ul>";
+    foreach ($warnings as $warning) {
+        echo "<li>$warning</li>";
+    }
+    echo "</ul>";
+    echo "</div>";
+}
+
+if (count($issues) == 0 && count($warnings) == 0) {
+    echo "<div style='background: #e8f5e9; padding: 15px; border-radius: 5px;'>";
+    echo "<h3 style='color: #2e7d32;'>✅ Không phát hiện vấn đề nghiêm trọng!</h3>";
+    echo "</div>";
+}
+
+// Recommendations
+echo "<br>=== HƯỚNG DẪN KHẮC PHỤC ===<br>";
+echo "<div style='background: #e3f2fd; padding: 15px; border-radius: 5px;'>";
+echo "<h3>📋 Các bước khắc phục:</h3>";
 echo "<ol>";
-echo "<li>Fix any errors shown above</li>";
-echo "<li>Configure email settings</li>";
-echo "<li>Update domain information</li>";
-echo "<li>Test all functionality</li>";
-echo "<li>Deploy to production</li>";
+echo "<li><strong>Tối ưu hình ảnh:</strong> Nén tất cả hình ảnh trong thư mục assets/images/ xuống dưới 200KB mỗi file. Sử dụng định dạng WebP nếu có thể.</li>";
+echo "<li><strong>Kiểm tra hosting:</strong> Đăng nhập InfinityFree Control Panel kiểm tra Resource Usage có vượt quá giới hạn không.</li>";
+echo "<li><strong>Xóa cache:</strong> Vào InfinityFree Control Panel → CloudFlare → Purge Cache</li>";
+echo "<li><strong>Kiểm tra lỗi PHP:</strong> Xem file logs/error.log để biết chi tiết lỗi</li>";
 echo "</ol>";
 echo "</div>";
 
-echo "<hr>";
-echo "<p><em>System check completed at: " . date('Y-m-d H:i:s') . "</em></p>";
-?> 
+echo "<br><small>Tool chẩn đoán - VINA LOGISTICS - " . date('Y-m-d H:i:s') . "</small>";
+?>

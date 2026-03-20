@@ -53,13 +53,27 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v23.0"></script>
 </head>
 <body>
-    <!-- Preloader -->
-    <div class="preloader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: flex; align-items: center; justify-content: center; z-index: 9999;">
+    <!-- Preloader with AUTO-HIDE timeout -->
+    <div class="preloader" id="mainPreloader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: flex; align-items: center; justify-content: center; z-index: 9999;">
         <div style="text-align: center;">
             <div style="width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #c3f725; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-            <p style="color: #c3f725; font-weight: 600;">Đang tải...</p>
+            <p style="color: #333; font-weight: 600;">Đang tải...</p>
         </div>
     </div>
+    
+    <!-- Auto-hide preloader using CSS animation (no JavaScript needed) -->
+    <style>
+        #mainPreloader {
+            animation: preloaderTimeout 3s forwards;
+        }
+        @keyframes preloaderTimeout {
+            0% { opacity: 1; visibility: visible; }
+            95% { opacity: 1; visibility: visible; }
+            100% { opacity: 0; visibility: hidden; display: none; }
+        }
+    </style>
+    
+
 
     <style>
         @keyframes spin {
@@ -67,6 +81,69 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
             100% { transform: rotate(360deg); }
         }
     </style>
+    
+    <!-- Auto-refresh mechanism to fix hanging issues -->
+    <script>
+    (function() {
+        var loadStartTime = Date.now();
+        var retryCount = 0;
+        var maxRetries = 2;
+        
+        // Check if page is hanging after 10 seconds
+        setTimeout(function() {
+            var elapsed = Date.now() - loadStartTime;
+            var preloader = document.querySelector('.preloader');
+            
+            // If preloader is still visible after 10 seconds, try to fix
+            if (preloader && preloader.style.display !== 'none') {
+                console.log('⚠️ Page loading slow, attempting auto-fix...');
+                autoFixHanging();
+            }
+        }, 10000);
+        
+        function autoFixHanging() {
+            if (retryCount >= maxRetries) {
+                console.log('❌ Auto-fix failed after ' + maxRetries + ' attempts');
+                return;
+            }
+            
+            retryCount++;
+            console.log('🔄 Auto-fix attempt #' + retryCount);
+            
+            // Fetch heartbeat to reset connection
+            fetch('heartbeat.php?t=' + Date.now(), {
+                method: 'GET',
+                cache: 'no-cache',
+                mode: 'cors'
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    console.log('✅ Heartbeat OK, reloading page...');
+                    // Small delay then reload
+                    setTimeout(function() {
+                        window.location.reload(true);
+                    }, 1500);
+                } else {
+                    throw new Error('Heartbeat failed');
+                }
+            })
+            .catch(function(err) {
+                console.log('⚠️ Heartbeat error:', err.message);
+                // Try again after delay
+                setTimeout(function() {
+                    autoFixHanging();
+                }, 3000);
+            });
+        }
+        
+        // Also listen for page load errors
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'IMG' || e.target.tagName === 'SCRIPT') {
+                console.log('⚠️ Resource load error:', e.target.src || e.target.href);
+            }
+        });
+    })();
+    </script>
 
     <!-- Top Contact Bar -->
     <div class="top-contact-bar">

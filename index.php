@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div style="text-align: center; position: relative;">
                     <!-- Hero Image -->
                     <div style="position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                        <img src="<?php echo asset_url('assets/images/index1.png'); ?>" alt="Vận chuyển hàng hóa" 
+                        <img src="<?php echo asset_url('assets/images/index1.jpg'); ?>" alt="Vận chuyển hàng hóa" 
                              style="width: 100%; height: 400px; object-fit: cover;">
                     </div>
                     

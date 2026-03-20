@@ -323,23 +323,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // === PRELOADER ===
     const preloader = document.querySelector('.preloader');
+    
+    // Function to hide preloader safely
+    function hidePreloader() {
+        if (preloader) {
+            preloader.style.opacity = '0';
+            preloader.style.display = 'none';
+            // Remove from DOM after transition
+            setTimeout(() => {
+                if (preloader.parentNode) {
+                    preloader.parentNode.removeChild(preloader);
+                }
+            }, 500);
+        }
+    }
+    
     if (preloader) {
-        // Hide preloader when DOM is ready
+        // Hide preloader when DOM is ready (quick hide for fast connections)
         setTimeout(() => {
-            preloader.style.opacity = '0';
-            setTimeout(() => {
-                preloader.style.display = 'none';
-            }, 500);
-        }, 1000);
+            hidePreloader();
+        }, 800);
         
-        // Also hide on window load as backup
+        // Backup: Force hide after 5 seconds regardless of loading state
+        setTimeout(() => {
+            hidePreloader();
+        }, 5000);
+        
+        // Hide on window load as backup
         window.addEventListener('load', function() {
-            preloader.style.opacity = '0';
-            setTimeout(() => {
-                preloader.style.display = 'none';
-            }, 500);
+            hidePreloader();
         });
     }
+    
+    // Global error handler to ensure preloader is hidden on errors
+    window.addEventListener('error', function(e) {
+        hidePreloader();
+    });
 
     console.log('✅ Vina Logistics website scripts loaded successfully!');
 }); 

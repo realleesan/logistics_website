@@ -148,7 +148,7 @@ RewriteRule ^search\.php$ /tim-kiem [R=301,L]
     ExpiresDefault "access plus 2 days"
 </IfModule>
 
-# PHP settings to prevent 500 errors
+# PHP settings optimized for InfinityFree
 <IfModule mod_php7.c>
     php_value memory_limit 256M
     php_value max_execution_time 300
@@ -156,6 +156,19 @@ RewriteRule ^search\.php$ /tim-kiem [R=301,L]
     php_value post_max_size 64M
     php_value upload_max_filesize 64M
     php_value max_file_uploads 20
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_value error_log logs/error.log
+    php_value default_socket_timeout 60
+</IfModule>
+
+# Fallback for PHP 8.x
+<IfModule mod_php.c>
+    php_value memory_limit 256M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value post_max_size 64M
+    php_value upload_max_filesize 64M
     php_flag display_errors Off
     php_flag log_errors On
     php_value error_log logs/error.log
