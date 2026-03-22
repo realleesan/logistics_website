@@ -449,6 +449,11 @@ p {
     transition: all 0.3s ease;
 }
 
+/* Mobile Action Buttons - hidden on desktop */
+.mobile-actions {
+    display: none;
+}
+
 .nav-link:hover,
 .nav-link.active {
     color: var(--primary-color);
@@ -489,6 +494,9 @@ p {
     flex-direction: column;
     cursor: pointer;
     padding: 5px;
+    background: transparent;
+    border: none;
+    z-index: 1001;
 }
 
 .mobile-toggle span {
@@ -497,6 +505,54 @@ p {
     background: var(--text-dark);
     margin: 3px 0;
     transition: 0.3s;
+}
+
+/* Header Action Buttons */
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-left: auto;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    border: 1px solid #2c3e50;
+    color: #2c3e50;
+    background: transparent;
+}
+
+.btn-action:hover {
+    color: #8bc34a;
+    border-color: #8bc34a;
+}
+
+.btn-register:hover,
+.btn-login:hover,
+.btn-tool:hover {
+    color: #8bc34a;
+    border-color: #8bc34a;
+}
+
+/* Tool button - keep orange background but change text color on hover */
+.btn-tool {
+    background: #ff9800;
+    border-color: #ff9800;
+    color: #ffffff;
+}
+
+.btn-tool:hover {
+    background: #f57c00;
+    border-color: #f57c00;
+    color: #ffffff;
 }
 
 /* === HERO SECTION === */
@@ -895,13 +951,16 @@ textarea.form-control {
     .nav-menu {
         display: none;
         position: fixed;
-        top: 102px;
+        top: 0;
         left: 0;
         right: 0;
+        bottom: 0;
         background: var(--bg-white);
         flex-direction: column;
-        padding: 20px;
+        padding: 80px 20px 20px;
         box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+        overflow-y: auto;
     }
 
     .nav-menu.active {
@@ -910,6 +969,28 @@ textarea.form-control {
 
     .mobile-toggle {
         display: flex;
+        z-index: 1001;
+        position: relative;
+    }
+
+    .header-actions {
+        display: none;
+    }
+
+    /* Mobile Action Buttons in nav-menu */
+    .mobile-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .mobile-actions .btn-action {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
     }
 
     .contact-info {

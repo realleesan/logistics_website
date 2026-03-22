@@ -55,8 +55,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     anchorLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const href = this.getAttribute('href');
+            
+            // Skip placeholder links (#) that don't navigate anywhere
+            if (href === '#' || href === '') {
+                e.preventDefault();
+                return;
+            }
+            
+            const target = document.querySelector(href);
             
             if (target) {
                 const offsetTop = target.offsetTop - 80; // Account for fixed header

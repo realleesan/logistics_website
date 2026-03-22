@@ -39,7 +39,7 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
     <script src="<?php echo asset_url('assets/js/search.js'); ?>" defer></script>
     
     <!-- Main Script -->
-    <script src="<?php echo asset_url('assets/js/main.js'); ?>" defer></script>
+    <!-- Loaded in footer.php for better performance -->
     
     <!-- Additional CSS for specific pages -->
     <?php if (isset($additional_css)): ?>
@@ -230,7 +230,32 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
                             <i class="fas fa-envelope"></i> Liên hệ
                         </a>
                     </li>
+                    <!-- Mobile Action Buttons -->
+                    <li class="nav-item mobile-actions">
+                        <a href="#" class="btn-action btn-register">
+                            <i class="fas fa-user-plus"></i> Đăng kí
+                        </a>
+                        <a href="#" class="btn-action btn-login">
+                            <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                        </a>
+                        <a href="#" class="btn-action btn-tool">
+                            <i class="fas fa-download"></i> Cài công cụ đặt hàng
+                        </a>
+                    </li>
                 </ul>
+
+                <!-- Action Buttons -->
+                <div class="header-actions">
+                    <a href="#" class="btn-action btn-register">
+                        <i class="fas fa-user-plus"></i> Đăng kí
+                    </a>
+                    <a href="#" class="btn-action btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                    </a>
+                    <a href="#" class="btn-action btn-tool">
+                        <i class="fas fa-download"></i> Cài công cụ đặt hàng
+                    </a>
+                </div>
 
                 <!-- Mobile Menu Toggle -->
                 <div class="mobile-toggle">
