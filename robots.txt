@@ -16,7 +16,7 @@ Allow: /logo.jpg
 Allow: /qr_code.jpg
 
 # Sitemap
-Sitemap: https://truongvinalogistics.com.vn/sitemap.xml
+Sitemap: https://truongvinalogistics.com/sitemap.xml
 
 # Crawl-delay for better server performance
 Crawl-delay: 1 

@@ -31,7 +31,7 @@ define('PROD_FROM_NAME', 'Trường VINA LOGISTICS');
 // ===========================================
 
 // Domain chính của website
-define('PROD_DOMAIN', 'truongvinalogistics.com.vn');
+define('PROD_DOMAIN', 'truongvinalogistics.com');
 define('PROD_BASE_URL', ''); // Để trống nếu website ở root domain
 
 // ===========================================

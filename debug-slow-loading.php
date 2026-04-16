@@ -42,7 +42,7 @@ echo "<!DOCTYPE html>
 <body>
     <div class='container'>
         <h1>🔍 Advanced Diagnostic Tool</h1>
-        <p><strong>Target:</strong> https://truongvinalogistics.com.vn/</p>
+        <p><strong>Target:</strong> https://truongvinalogistics.com/</p>
         <p><strong>Time:</strong> " . date('Y-m-d H:i:s') . "</p>
         <p><strong>PHP Version:</strong> " . PHP_VERSION . "</p>";
 

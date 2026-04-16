@@ -14,7 +14,7 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
     <meta name="keywords" content="<?php echo isset($page_keywords) ? $page_keywords : getDynamicKeywords('general'); ?>">
     <meta name="author" content="VINA LOGISTICS">
     
-    <!-- Open Graph Meta Tags -->
+    <!-- Open Graph Meta Tags --> 
     <meta property="og:title" content="<?php echo isset($page_title) ? $page_title : 'VINA LOGISTICS - Uy tín - Niềm tin'; ?>">
     <meta property="og:description" content="<?php echo isset($page_description) ? $page_description : 'Dịch vụ vận chuyển hàng hóa uy tín, chuyên nghiệp'; ?>">
     <meta property="og:type" content="website">
@@ -232,10 +232,10 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
                     </li>
                     <!-- Mobile Action Buttons -->
                     <li class="nav-item mobile-actions">
-                        <a href="#" class="btn-action btn-register">
-                            <i class="fas fa-user-plus"></i> Đăng kí
+                        <a href="https://order.truongvinalogistics.com/authen/login/?ref=register" class="btn-action btn-register">
+                            <i class="fas fa-user-plus"></i> Đăng ký
                         </a>
-                        <a href="#" class="btn-action btn-login">
+                        <a href="https://order.truongvinalogistics.com/authen/login/" class="btn-action btn-login">
                             <i class="fas fa-sign-in-alt"></i> Đăng nhập
                         </a>
                         <a href="#" class="btn-action btn-tool">
@@ -246,10 +246,10 @@ $current_page = basename($_SERVER['PHP_SELF'], '.php');
 
                 <!-- Action Buttons -->
                 <div class="header-actions">
-                    <a href="#" class="btn-action btn-register">
+                    <a href="https://order.truongvinalogistics.com/authen/login/?ref=register" class="btn-action btn-register">
                         <i class="fas fa-user-plus"></i> Đăng kí
                     </a>
-                    <a href="#" class="btn-action btn-login">
+                    <a href="https://order.truongvinalogistics.com/authen/login/" class="btn-action btn-login">
                         <i class="fas fa-sign-in-alt"></i> Đăng nhập
                     </a>
                     <a href="#" class="btn-action btn-tool">
