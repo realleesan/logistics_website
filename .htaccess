@@ -1,8 +1,5 @@
 RewriteEngine On
 
-# Redirect 301 from old domain to new domain
-RewriteCond %{HTTP_HOST} ^truongvinalogistics\.com\.vn [NC]
-RewriteRule ^(.*)$ https://truongvinalogistics.com/$1 [L,R=301]
 
 # Force HTTPS for production
 RewriteCond %{HTTPS} off
